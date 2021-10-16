@@ -6,7 +6,8 @@
 char json[100];
 char *Pjson=&json[0];
 static FILE *f;
-char path[30]="/var/www/html/info.json";
+char path[100]="/var/www/html/info.json";
+char *Ppath=&path[0];
 
 void addTime(void)
 {
@@ -34,7 +35,8 @@ void split_query(char *string){
     
     char *part1;
     char *part2;
-    int index=1,first=0;
+    int index=1;
+    int first=0;
     char j[10]=" ";
     char *pj=&j[0];
     while (index)
@@ -54,13 +56,13 @@ void split_query(char *string){
         strncat(text2,(string+(strlen(string)-strlen(part1))+1),(strlen(part1)-strlen(part2)-1));
         sprintf(string,"%s",(part2+1));
         sprintf(pj,"\"%s\": \"%s\",",text1,text2);
+        Pjson=strcat(Pjson,pj);
         if(!first)
         {
-            sprintf(path,"/var/www/html/%s.json",text2);
+            sprintf(Ppath,"/var/www/html/%s.json",text2);
             printf("Set-Cookie: user=%s; Path=/ \n",text2);
             first=1;
         }
-        Pjson=strcat(Pjson,pj);
     }
 }
 
@@ -87,14 +89,12 @@ int main (int argc, char *argv[])
         }
     }
     free(envPtr);
-
     printf ("\n");
-
     printf ("<HTML>\n"); 
     printf ("<HEAD>\n"); 
     printf ("<TITLE>CGI Environment Variable</TITLE>\n"); 
     printf ("</HEAD>\n"); 
-    printf ("<BODY>\n"); 
+    printf ("<BODY>\n");
     printf ("</BODY>\n");
     printf("<script>");
     printf("window.addEventListener('load',()=>{");
