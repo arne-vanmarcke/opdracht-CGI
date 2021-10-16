@@ -102,8 +102,12 @@ int main (int argc, char *argv[])
     }
     free(envPtr);
 
-
-    printf ("</BODY>\n"); 
+    printf ("<br>\n");
+    printf ("</BODY>\n");
+    printf("<script>");
+    printf("window.addEventListener('load',()=>{");
+    printf("window.location.replace(\"http://rpi-arnev/index.html\")})");
+    printf("</script>");
     printf ("</HTML>\n");
     return (EXIT_SUCCESS); 
 }
