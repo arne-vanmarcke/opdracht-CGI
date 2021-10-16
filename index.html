@@ -13,33 +13,45 @@
     <tbody id="tbdy"></tbody>
   </table>
   <form action='/cgi-bin/ENV-CGI' method='POST'>
-    <input type='text' name='name' value=''>
-    <input type='text' name='surname' value=''>
-    <input type='text' name='keja' value=''>
+    <div>
+      <label >Naam</label>
+      <input type='text' name='Naam' value=''>
+    </div>
+
+    <div>
+      <span>Achternaam</span>
+      <input type='text' name='Achternaam' value=''>
+    </div>
+
     <input type='submit'>
   </form>
   <script>
-    console.log("hier");
-    var table=document.getElementById("tbdy");
-    fetch("./info.json")
-    .then(res=>res.json())
-    .then(res=>{
-      Object.keys(res).forEach(key=> {
-        let row = document.createElement('tr');
-        let header = document.createElement('th');
-        let td = document.createElement('td');
-        var value = res[key];
-        td.innerHTML=value;
-        header.innerHTML=key;
-        header.scope="row";
-        row.appendChild(header);
-        row.appendChild(td);
-        table.appendChild(row);
+    window.addEventListener('load',()=>{
+      let _cookie=document.cookie;
+      console.log("Cookie: ",_cookie);
+      var name=_cookie.split('=')[1];
 
-        console.log(key+": "+value);
-      });
-    })
-    .catch(err=>console.log(err));
+      var table=document.getElementById("tbdy");
+      fetch(`./${name}.json`)
+      .then(res=>res.json())
+      .then(res=>{
+        Object.keys(res).forEach(key=> {
+          let row = document.createElement('tr');
+          let header = document.createElement('th');
+          let td = document.createElement('td');
+          var value = res[key];
+          td.innerHTML=value;
+          header.innerHTML=key;
+          header.scope="row";
+          row.appendChild(header);
+          row.appendChild(td);
+          table.appendChild(row);
+
+          console.log(key+": "+value);
+        });
+      })
+      .catch(err=>console.log(err));
+      })
   </script>
 </body>
 </html>
