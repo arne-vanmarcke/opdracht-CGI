@@ -6,6 +6,7 @@
 char json[100];
 char *Pjson=&json[0];
 static FILE *f;
+char path[30]="/var/www/html/info.json";
 
 void addTime(void)
 {
@@ -33,7 +34,7 @@ void split_query(char *string){
     
     char *part1;
     char *part2;
-    int index=1;
+    int index=1,first=0;
     char j[10]=" ";
     char *pj=&j[0];
     while (index)
@@ -53,6 +54,12 @@ void split_query(char *string){
         strncat(text2,(string+(strlen(string)-strlen(part1))+1),(strlen(part1)-strlen(part2)-1));
         sprintf(string,"%s",(part2+1));
         sprintf(pj,"\"%s\": \"%s\",",text1,text2);
+        if(!first)
+        {
+            sprintf(path,"/var/www/html/%s.json",text2);
+            printf("Set-Cookie: user=%s; Path=/ \n",text2);
+            first=1;
+        }
         Pjson=strcat(Pjson,pj);
     }
 }
@@ -61,39 +68,18 @@ int main (int argc, char *argv[])
 { 
     char *envPtr;
 
-    printf ("Content-type: text/html\n"); 
-    printf ("\n"); 
-    printf ("<HTML>\n"); 
-    printf ("<HEAD>\n"); 
-    printf ("<TITLE>CGI Environment Variable</TITLE>\n"); 
-    printf ("</HEAD>\n"); 
-    printf ("<BODY>\n"); 
+    printf ("Content-type: text/html\n");
 
     envPtr= getenv ("REQUEST_METHOD"); 
-    printf ("REQUEST_METHOD= "); 
-    if (!envPtr) 
-        printf ("<NULL-POINTER>\n"); 
-    else 
-        printf ("%s\n", envPtr); 
-    printf ("<br>\n");
-
     envPtr = getenv("CONTENT_LENGTH");
     long len = strtol(envPtr, NULL, 10);
     envPtr = malloc(len + 1);
-    printf("query= ");
-    if (!envPtr)
-    {
-        printf ("<NULL-POINTER>\n"); 
-    }
-    else
+    if (envPtr)
     {
         fgets(envPtr, len + 1, stdin);
-        printf ("q=%s",envPtr);
         split_query(envPtr);
         addTime();
-        printf ("<br>\n");
-        printf("{%s}\n",Pjson);
-        f=fopen("/var/www/html/info.json","w");
+        f=fopen(&path[0],"w");
         if(f)
         {
             fprintf(f,"{%s}",Pjson);
@@ -102,7 +88,13 @@ int main (int argc, char *argv[])
     }
     free(envPtr);
 
-    printf ("<br>\n");
+    printf ("\n");
+
+    printf ("<HTML>\n"); 
+    printf ("<HEAD>\n"); 
+    printf ("<TITLE>CGI Environment Variable</TITLE>\n"); 
+    printf ("</HEAD>\n"); 
+    printf ("<BODY>\n"); 
     printf ("</BODY>\n");
     printf("<script>");
     printf("window.addEventListener('load',()=>{");
